@@ -1,6 +1,6 @@
 require('dotenv').config();
 
-const { Sequelize } = require('sequelize');
+const { Sequelize, DataTypes } = require('sequelize');
 const sequelize = new Sequelize(
     process.env.DB_DBNAME,
     process.env.DB_USER,
@@ -11,12 +11,34 @@ const sequelize = new Sequelize(
     }
 );
 
-(async() => {
-    try {
-        await sequelize.authenticate();
-        console.log('Connection has been established successfully.');
-    } catch (error) {
-        console.error('Unable to connect to the database:', error);
+const User = sequelize.define("User", {
+    username: {
+        type: DataTypes.STRING,
     }
+})
+
+/*
+    One to One Relationships
+*/
+
+const Profile = sequelize.define("Profile", {
+    birthday: {
+        type: DataTypes.DATE,
+    }
+})
+
+User.hasOne(Profile);
+Profile.belongsTo(User);
+
+/*
+    One to Many Relationships
+*/
+
+/*
+    Many to Many Relationships
+*/
+
+;(async() => {
+    await sequelize.sync();
 })();
 
