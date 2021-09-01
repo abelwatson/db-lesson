@@ -26,19 +26,56 @@ const Profile = sequelize.define("Profile", {
         type: DataTypes.DATE,
     }
 })
-
-User.hasOne(Profile);
+User.hasOne(Profile, {
+    onDelete: "CASCADE",
+});
 Profile.belongsTo(User);
 
 /*
     One to Many Relationships
 */
 
+const Order = sequelize.define("Order", {
+    shipDate: {
+        type: DataTypes.DATE,
+    }
+})
+
+User.hasMany(Order);
+Order.belongsTo(User);
+
 /*
     Many to Many Relationships
 */
 
+const Class = sequelize.define("Class", {
+    className: {
+        type: DataTypes.STRING,
+    },
+    startDate: {
+        type: DataTypes.DATE,
+    }
+})
+
+User.belongsToMany(Class, {through: "Users_Classes"});
+Class.belongsToMany(User, {through: "Users_Classes"})
+
+
 ;(async() => {
-    await sequelize.sync();
+    await sequelize.sync({
+        force: true //used to empty tables
+    });
+    let my_user = await User.create({username: "Abel"})
+    let my_profile = await Profile.create({birthday: new Date()})
+    console.log(await my_user.getProfile())
+    await my_user.setProfile(my_profile)
+    console.log(await my_user.getProfile())
+
+    let resultUser = await User.findOne({
+        where: {
+            id: 1
+        }
+    })
+    console.log(await resultUser.getProfile())
 })();
 
